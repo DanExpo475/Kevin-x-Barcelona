@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kevin a BCN — Las Loquistas del Centro</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Space+Mono:wght@400;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --negro: #12100a;
+  --ocre: #c8882a;
+  --ocre-light: #e8b96a;
+  --crema: #f5eedf;
+  --terracota: #b84c2e;
+  --verde: #3a6b4a;
+  --rosa: #c4547a;
+  --morado: #7c4daa;
+  --azul: #1a3a8a;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+body { background-color: var(--negro); color: var(--crema); font-family:'Outfit',sans-serif; min-height:100vh; overflow-x:hidden; }
+
+/* ── PANOT BACKGROUND (real panot: 4 interlocking circles) ── */
+.panot-bg { position:fixed; inset:0; z-index:0; overflow:hidden; pointer-events:none; }
+.panot-bg svg { width:100%; height:100%; }
+
+/* ── GRAIN ── */
+.grain { position:fixed; inset:0; z-index:1; pointer-events:none; opacity:0.3;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E"); }
+
+.content { position:relative; z-index:2; max-width:1040px; margin:0 auto; padding:0 24px 80px; }
+
+/* ── HERO ── */
+.hero { text-align:center; padding:68px 0 44px; }
+.hero-tag {
+  font-family:'Space Mono',monospace; font-size:11px; letter-spacing:.22em;
+  text-transform:uppercase; color:var(--ocre); margin-bottom:20px;
+  display:flex; align-items:center; justify-content:center; gap:14px;
+}
+.hero-tag::before,.hero-tag::after { content:''; width:48px; height:1px; background:var(--ocre); opacity:.45; }
+.hero h1 {
+  font-family:'Playfair Display',serif; font-size:clamp(50px,8.5vw,92px);
+  font-weight:700; line-height:.9; letter-spacing:-.02em; color:var(--crema);
+}
+.hero h1 em { font-style:italic; color:var(--ocre); }
+.hero-sub { font-family:'Space Mono',monospace; font-size:12px; color:rgba(245,238,223,.35); margin-top:18px; letter-spacing:.08em; }
+.hero-authors {
+  display:inline-flex; align-items:center; gap:10px; margin-top:24px;
+  background:rgba(200,136,42,.1); border:1px solid rgba(200,136,42,.25);
+  border-radius:999px; padding:8px 22px; font-size:13px; color:var(--ocre-light);
+  font-family:'Space Mono',monospace;
+}
+.intro { text-align:center; max-width:560px; margin:22px auto 0; font-size:14px; font-weight:300; line-height:1.8; color:rgba(245,238,223,.48); }
+.intro em { color:var(--ocre-light); font-style:italic; }
+
+/* ── TABS ── */
+.tabs-wrapper { position:sticky; top:0; z-index:100; background:linear-gradient(to bottom,var(--negro) 82%,transparent); padding:18px 0 0; margin-top:36px; }
+.tabs { display:flex; gap:0; border-bottom:1px solid rgba(200,136,42,.18); overflow-x:auto; scrollbar-width:none; }
+.tabs::-webkit-scrollbar { display:none; }
+.tab-btn {
+  font-family:'Space Mono',monospace; font-size:10px; letter-spacing:.1em; text-transform:uppercase;
+  padding:10px 15px; border:none; background:transparent; color:rgba(245,238,223,.38);
+  cursor:pointer; white-space:nowrap; border-bottom:2px solid transparent; margin-bottom:-1px; transition:all .2s;
+}
+.tab-btn:hover { color:var(--ocre-light); }
+.tab-btn.active { color:var(--ocre); border-bottom-color:var(--ocre); }
+
+/* ── TAB PANELS ── */
+.tab-panel { display:none; padding-top:30px; }
+.tab-panel.active { display:block; }
+
+/* ── FILTERS ── */
+.filters { display:flex; gap:7px; flex-wrap:wrap; margin-bottom:26px; }
+.filter-btn {
+  font-family:'Space Mono',monospace; font-size:9px; letter-spacing:.1em; text-transform:uppercase;
+  padding:5px 13px; border-radius:999px; border:1px solid rgba(200,136,42,.22); background:transparent;
+  color:rgba(245,238,223,.42); cursor:pointer; transition:all .2s;
+}
+.filter-btn:hover { border-color:var(--ocre); color:var(--ocre-light); }
+.filter-btn.active { background:var(--ocre); border-color:var(--ocre); color:var(--negro); font-weight:700; }
+
+/* ── SECTION HEADER ── */
+.section-header { display:flex; align-items:baseline; justify-content:space-between; margin-bottom:16px; }
+.section-title { font-family:'Playfair Display',serif; font-size:24px; font-weight:400; font-style:italic; }
+.section-count { font-family:'Space Mono',monospace; font-size:10px; color:rgba(200,136,42,.5); }
+
+/* ── GRID ── */
+.grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:12px; }
+
+/* ── CARD ── */
+.card {
+  background:rgba(245,238,223,.032); border:1px solid rgba(200,136,42,.15);
+  border-radius:3px; padding:16px; transition:all .2s; position:relative; overflow:hidden;
+  animation:fadeUp .3s ease both;
+}
+.card::before { content:''; position:absolute; top:0;left:0;right:0; height:2px; background:var(--accent,var(--ocre)); transform:scaleX(0); transform-origin:left; transition:transform .25s; }
+.card:hover { background:rgba(200,136,42,.055); border-color:rgba(200,136,42,.32); transform:translateY(-2px); }
+.card:hover::before { transform:scaleX(1); }
+.card.featured { border-color:rgba(200,136,42,.42); background:rgba(200,136,42,.065); }
+.card.run-card { --accent:#3a6b4a; border-color:rgba(58,107,74,.2); }
+.card.romantic-card { --accent:var(--rosa); border-color:rgba(196,84,122,.2); background:rgba(196,84,122,.04); }
+.card.romantic-card:hover { background:rgba(196,84,122,.08); border-color:rgba(196,84,122,.38); }
+.card-watermark { position:absolute; bottom:-12px; right:-12px; width:64px; height:64px; opacity:.04; pointer-events:none; }
+
+.card-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px; }
+.card-badges { display:flex; gap:4px; flex-wrap:wrap; }
+.badge { font-family:'Space Mono',monospace; font-size:8px; letter-spacing:.06em; text-transform:uppercase; padding:2px 6px; border-radius:2px; }
+.badge-residente { background:rgba(58,107,74,.2); color:#7dc49a; border:1px solid rgba(58,107,74,.32); }
+.badge-turista { background:rgba(26,58,138,.2); color:#8fb0e8; border:1px solid rgba(26,58,138,.32); }
+.badge-comida { background:rgba(184,76,46,.18); color:#e8906f; border:1px solid rgba(184,76,46,.28); }
+.badge-bar,.badge-bares { background:rgba(200,136,42,.18); color:var(--ocre-light); border:1px solid rgba(200,136,42,.28); }
+.badge-cultura { background:rgba(90,60,120,.2); color:#c4a0e8; border:1px solid rgba(90,60,120,.32); }
+.badge-mirador { background:rgba(58,107,74,.18); color:#7dc49a; border:1px solid rgba(58,107,74,.28); }
+.badge-running { background:rgba(58,107,74,.18); color:#7dc49a; border:1px solid rgba(58,107,74,.28); }
+.badge-costa,.badge-playa { background:rgba(26,58,138,.18); color:#8fb0e8; border:1px solid rgba(26,58,138,.28); }
+.badge-pueblo { background:rgba(184,76,46,.18); color:#e8906f; border:1px solid rgba(184,76,46,.28); }
+.badge-montana { background:rgba(58,107,74,.18); color:#7dc49a; border:1px solid rgba(58,107,74,.28); }
+.badge-fiesta,.badge-club { background:rgba(124,77,170,.2); color:#d4a0f0; border:1px solid rgba(124,77,170,.32); }
+.badge-gay { background:rgba(196,84,122,.2); color:#f0a0c0; border:1px solid rgba(196,84,122,.32); }
+.badge-japones { background:rgba(184,76,46,.18); color:#f0a090; border:1px solid rgba(184,76,46,.28); }
+.badge-tienda,.badge-bazar { background:rgba(200,136,42,.18); color:var(--ocre-light); border:1px solid rgba(200,136,42,.28); }
+.badge-asiatico { background:rgba(90,60,120,.18); color:#c4a0e8; border:1px solid rgba(90,60,120,.28); }
+.badge-plan { background:rgba(58,107,74,.18); color:#7dc49a; border:1px solid rgba(58,107,74,.28); }
+.badge-romantico { background:rgba(196,84,122,.2); color:#f0a0c0; border:1px solid rgba(196,84,122,.32); }
+.badge-brunch { background:rgba(200,136,42,.15); color:var(--ocre-light); border:1px solid rgba(200,136,42,.25); }
+.badge-pizza { background:rgba(184,76,46,.15); color:#e8906f; border:1px solid rgba(184,76,46,.25); }
+.badge-cafe { background:rgba(90,60,120,.15); color:#c4a0e8; border:1px solid rgba(90,60,120,.25); }
+.badge-helado { background:rgba(26,58,138,.15); color:#8fb0e8; border:1px solid rgba(26,58,138,.25); }
+
+.card-rating { font-family:'Space Mono',monospace; font-size:11px; color:var(--ocre); }
+.card-name { font-family:'Playfair Display',serif; font-size:16px; font-weight:700; color:var(--crema); line-height:1.2; margin-bottom:3px; }
+.card.featured .card-name { color:var(--ocre-light); }
+.card.romantic-card .card-name { color:#f0b8cc; }
+.card-meta { font-family:'Space Mono',monospace; font-size:9px; color:rgba(245,238,223,.28); letter-spacing:.05em; margin-bottom:9px; }
+.card-tip { font-size:12px; font-weight:300; line-height:1.6; color:rgba(245,238,223,.6); border-top:1px solid rgba(200,136,42,.12); padding-top:9px; }
+.card-tip strong { color:var(--ocre-light); font-weight:500; }
+.card.romantic-card .card-tip { border-top-color:rgba(196,84,122,.18); }
+
+/* run stats */
+.run-stat { display:flex; gap:14px; margin:6px 0 10px; }
+.run-stat-item { font-family:'Space Mono',monospace; }
+.run-stat-val { color:#7dc49a; font-weight:700; display:block; font-size:13px; }
+.run-stat-label { color:rgba(245,238,223,.3); font-size:8px; }
+
+/* romantic header */
+.romantic-header { text-align:center; padding:12px 0 32px; }
+.romantic-header h2 { font-family:'Playfair Display',serif; font-size:34px; font-style:italic; color:#f0b8cc; margin-bottom:8px; }
+.romantic-header p { font-size:13px; color:rgba(245,238,223,.42); font-weight:300; line-height:1.7; max-width:460px; margin:0 auto; }
+
+/* info boxes */
+.info-box { background:rgba(200,136,42,.07); border:1px solid rgba(200,136,42,.22); border-radius:3px; padding:14px 18px; margin-bottom:24px; font-size:12px; line-height:1.7; color:rgba(245,238,223,.58); }
+.info-box strong { color:var(--ocre-light); }
+.love-box { background:rgba(196,84,122,.06); border:1px solid rgba(196,84,122,.2); border-radius:3px; padding:18px 22px; margin-bottom:28px; text-align:center; }
+.love-box .love-names { font-family:'Playfair Display',serif; font-size:20px; color:#f0b8cc; margin-bottom:6px; }
+.love-box p { font-size:12px; color:rgba(245,238,223,.45); line-height:1.7; font-weight:300; }
+
+/* divider */
+.divider { display:flex; align-items:center; gap:12px; margin:28px 0 18px; }
+.divider-line { flex:1; height:1px; background:rgba(200,136,42,.15); }
+.divider-label { font-family:'Space Mono',monospace; font-size:9px; letter-spacing:.18em; text-transform:uppercase; color:rgba(200,136,42,.45); }
+
+/* footer */
+.footer-note { text-align:center; margin-top:56px; padding-top:32px; border-top:1px solid rgba(200,136,42,.12); }
+.footer-panots { display:flex; justify-content:center; gap:12px; margin-bottom:14px; opacity:.3; }
+.footer-text { font-family:'Playfair Display',serif; font-size:13px; font-style:italic; color:rgba(245,238,223,.32); }
+.footer-text strong { color:var(--ocre); font-style:normal; font-family:'Space Mono',monospace; font-size:11px; }
+
+.empty-state { grid-column:1/-1; text-align:center; padding:40px; font-family:'Playfair Display',serif; font-style:italic; color:rgba(245,238,223,.22); font-size:17px; }
+
+@keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+</style>
+</head>
+<body>
+
+<!-- REAL PANOT BACKGROUND: 4 interlocking circles -->
+<div class="panot-bg">
+<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+<defs>
+  <pattern id="pt" x="0" y="0" width="90" height="90" patternUnits="userSpaceOnUse">
+    <rect width="90" height="90" fill="none"/>
+    <!-- outer border -->
+    <rect x="3" y="3" width="84" height="84" fill="none" stroke="#c8882a" stroke-width="1.2" opacity="0.55"/>
+    <!-- inner border -->
+    <rect x="9" y="9" width="72" height="72" fill="none" stroke="#c8882a" stroke-width="0.6" opacity="0.35"/>
+    <!-- 4 interlocking circles (real panot de Barcelona) -->
+    <!-- top-left circle -->
+    <circle cx="31" cy="31" r="17" fill="none" stroke="#c8882a" stroke-width="1.4" opacity="0.7"/>
+    <!-- top-right circle -->
+    <circle cx="59" cy="31" r="17" fill="none" stroke="#c8882a" stroke-width="1.4" opacity="0.7"/>
+    <!-- bottom-left circle -->
+    <circle cx="31" cy="59" r="17" fill="none" stroke="#c8882a" stroke-width="1.4" opacity="0.7"/>
+    <!-- bottom-right circle -->
+    <circle cx="59" cy="59" r="17" fill="none" stroke="#c8882a" stroke-width="1.4" opacity="0.7"/>
+    <!-- center small circle -->
+    <circle cx="45" cy="45" r="8" fill="none" stroke="#c8882a" stroke-width="1.1" opacity="0.6"/>
+  </pattern>
+</defs>
+<rect width="100%" height="100%" fill="url(#pt)" opacity="0.16"/>
+</svg>
+</div>
+<div class="grain"></div>
+
+<div class="content">
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-tag"><span>✦</span>Las Loquistas del Centro<span>✦</span></div>
+  <h1>Bienvenido<br>a <em>Barcelona,</em><br>Kevin</h1>
+  <p class="hero-sub">41°23'N · 2°11'E · Ciudad Condal</p>
+  <div class="hero-authors">✦ Una guía de Ayelm &amp; Dani ✦</div>
+  <p class="intro">Esto no es TripAdvisor. Son los sitios donde <em>nosotras de verdad comemos, bebemos y respiramos esta ciudad</em> — más algunos imprescindibles que tienes que hacer al menos una vez.</p>
+</div>
+
+<!-- TABS -->
+<div class="tabs-wrapper">
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('favoritos',this)">✦ Favoritos</button>
+    <button class="tab-btn" onclick="switchTab('running',this)">↳ Running</button>
+    <button class="tab-btn" onclick="switchTab('escapadas',this)">↳ Escapadas</button>
+    <button class="tab-btn" onclick="switchTab('fiesta',this)">↳ Noche &amp; Fiesta</button>
+    <button class="tab-btn" onclick="switchTab('asia',this)">↳ Asia &amp; Bazares</button>
+    <button class="tab-btn" onclick="switchTab('planes',this)">↳ Planes Diferentes</button>
+    <button class="tab-btn" onclick="switchTab('romantic',this)">♡ The Romantic</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ FAVORITOS ═══════════════════════════════════ -->
+<div id="tab-favoritos" class="tab-panel active">
+  <div class="filters" id="fav-filters">
+    <button class="filter-btn active" onclick="filterTab('fav','all',this)">✦ Todo</button>
+    <button class="filter-btn" onclick="filterTab('fav','residente',this)">Residente</button>
+    <button class="filter-btn" onclick="filterTab('fav','turista',this)">Turista</button>
+    <button class="filter-btn" onclick="filterTab('fav','comida',this)">Comer</button>
+    <button class="filter-btn" onclick="filterTab('fav','bar',this)">Beber</button>
+    <button class="filter-btn" onclick="filterTab('fav','brunch',this)">Brunch &amp; Café</button>
+    <button class="filter-btn" onclick="filterTab('fav','pizza',this)">Pizza</button>
+    <button class="filter-btn" onclick="filterTab('fav','helado',this)">Helado</button>
+    <button class="filter-btn" onclick="filterTab('fav','cultura',this)">Cultura</button>
+    <button class="filter-btn" onclick="filterTab('fav','mirador',this)">Vistas</button>
+  </div>
+  <div class="section-header">
+    <div class="section-title" id="fav-title">Todos los favoritos</div>
+    <div class="section-count" id="fav-count"></div>
+  </div>
+  <div class="grid" id="fav-grid"></div>
+</div>
+
+<!-- ═══════════════════════════════════ RUNNING ═══════════════════════════════════ -->
+<div id="tab-running" class="tab-panel">
+  <div class="info-box"><strong>Para corredores de verdad.</strong> Barcelona es una ciudad hecha para correr — tienes mar, montaña, parques y rutas urbanas espectaculares. Del más fácil al más exigente.</div>
+  <div class="section-header">
+    <div class="section-title">Rutas para correr</div>
+    <div class="section-count">8 rutas</div>
+  </div>
+  <div class="grid" id="run-grid"></div>
+</div>
+
+<!-- ═══════════════════════════════════ ESCAPADAS ═══════════════════════════════════ -->
+<div id="tab-escapadas" class="tab-panel">
+  <div class="info-box"><strong>Cataluña es enorme y preciosa.</strong> A menos de 2h tienes todo: Costa Brava, pueblos medievales, volcanes y el Mediterráneo más salvaje. Imprescindibles.</div>
+  <div class="filters" id="esc-filters">
+    <button class="filter-btn active" onclick="filterTab('esc','all',this)">✦ Todo</button>
+    <button class="filter-btn" onclick="filterTab('esc','costa',this)">Costa</button>
+    <button class="filter-btn" onclick="filterTab('esc','pueblo',this)">Pueblos</button>
+    <button class="filter-btn" onclick="filterTab('esc','montana',this)">Montaña</button>
+  </div>
+  <div class="section-header">
+    <div class="section-title" id="esc-title">Escapadas imprescindibles</div>
+    <div class="section-count" id="esc-count"></div>
+  </div>
+  <div class="grid" id="esc-grid"></div>
+</div>
+
+<!-- ═══════════════════════════════════ FIESTA ═══════════════════════════════════ -->
+<div id="tab-fiesta" class="tab-panel">
+  <div class="info-box"><strong>Barcelona tiene una de las mejores escenas nocturnas de Europa.</strong> Ambiente gay en el Gayxample, electrónica en el Poble Sec, y bares que abren cuando los demás cierran.</div>
+  <div class="filters" id="fie-filters">
+    <button class="filter-btn active" onclick="filterTab('fie','all',this)">✦ Todo</button>
+    <button class="filter-btn" onclick="filterTab('fie','gay',this)">Ambiente gay</button>
+    <button class="filter-btn" onclick="filterTab('fie','club',this)">Clubs</button>
+    <button class="filter-btn" onclick="filterTab('fie','bares',this)">Bares nocturnos</button>
+  </div>
+  <div class="section-header">
+    <div class="section-title" id="fie-title">Noche &amp; Fiesta</div>
+    <div class="section-count" id="fie-count"></div>
+  </div>
+  <div class="grid" id="fie-grid"></div>
+</div>
+
+<!-- ═══════════════════════════════════ ASIA ═══════════════════════════════════ -->
+<div id="tab-asia" class="tab-panel">
+  <div class="info-box"><strong>Barcelona tiene una escena asiática increíble</strong> — desde japoneses auténticos hasta bazares tipo konbini. Para los que saben.</div>
+  <div class="filters" id="asia-filters">
+    <button class="filter-btn active" onclick="filterTab('asia','all',this)">✦ Todo</button>
+    <button class="filter-btn" onclick="filterTab('asia','japones',this)">Japonés</button>
+    <button class="filter-btn" onclick="filterTab('asia','tienda',this)">Bazares &amp; Tiendas</button>
+    <button class="filter-btn" onclick="filterTab('asia','asiatico',this)">Otros asiáticos</button>
+  </div>
+  <div class="section-header">
+    <div class="section-title" id="asia-title">Asia &amp; Bazares</div>
+    <div class="section-count" id="asia-count"></div>
+  </div>
+  <div class="grid" id="asia-grid"></div>
+</div>
+
+<!-- ═══════════════════════════════════ PLANES ═══════════════════════════════════ -->
+<div id="tab-planes" class="tab-panel">
+  <div class="info-box"><strong>Más allá de lo típico.</strong> Barcelona tiene capas. Estos son los planes que hacen que la ciudad te enamore de verdad.</div>
+  <div class="section-header">
+    <div class="section-title">Planes diferentes</div>
+    <div class="section-count" id="planes-count"></div>
+  </div>
+  <div class="grid" id="planes-grid"></div>
+</div>
+
+<!-- ═══════════════════════════════════ ROMANTIC ═══════════════════════════════════ -->
+<div id="tab-romantic" class="tab-panel">
+  <div class="romantic-header">
+    <h2>The Romantic</h2>
+    <p>Para Kevin &amp; Juanjo — porque Barcelona es una ciudad para enamorarse (o para seguir enamorado).</p>
+  </div>
+  <div class="love-box">
+    <div class="love-names">Kevin ♡ Juanjo</div>
+    <p>Esta sección es solo para vosotros dos. Cada plan está pensado para que salgas con la sensación de que vivís en la ciudad más bonita del mundo. Porque es verdad.</p>
+  </div>
+  <div class="section-header">
+    <div class="section-title">Planes para dos</div>
+    <div class="section-count" id="romantic-count"></div>
+  </div>
+  <div class="grid" id="romantic-grid"></div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer-note">
+  <div class="footer-panots">
+    <svg width="22" height="22" viewBox="0 0 90 90"><rect x="3" y="3" width="84" height="84" fill="none" stroke="#c8882a" stroke-width="2"/><circle cx="31" cy="31" r="17" fill="none" stroke="#c8882a" stroke-width="2"/><circle cx="59" cy="31" r="17" fill="none" stroke="#c8882a" stroke-width="2"/><circle cx="31" cy="59" r="17" fill="none" stroke="#c8882a" stroke-width="2"/><circle cx="59" cy="59" r="17" fill="none" stroke="#c8882a" stroke-width="2"/><circle cx="45" cy="45" r="8" fill="none" stroke="#c8882a" stroke-width="2"/></svg>
+    <svg width="22" height="22" viewBox="0 0 90 90"><rect x="3" y="3" width="84" height="84" fill="none" stroke="#c8882a" stroke-width="2"/><circle cx="31" cy="31" r="17" fill="none" stroke="#c8882a" stroke-width="2"/><circle cx="59" cy="31" r="17" fill="none" stroke="#c8882a" stroke-width="2"/><circle cx="31" cy="59" r="17" fill="none" stroke="#c8882a" stroke-width="2"/><circle cx="59" cy="59" r="17" fill="none" stroke="#c8882a" stroke-width="2"/><circle cx="45" cy="45" r="8" fill="none" stroke="#c8882a" stroke-width="2"/></svg>
+    <svg width="22" height="22" viewBox="0 0 90 90"><rect x="3" y="3" width="84" height="84" fill="none" stroke="#c8882a" stroke-width="2"/><circle cx="31" cy="31" r="17" fill="none" stroke="#c8882a" stroke-width="2"/><circle cx="59" cy="31" r="17" fill="none" stroke="#c8882a" stroke-width="2"/><circle cx="31" cy="59" r="17" fill="none" stroke="#c8882a" stroke-width="2"/><circle cx="59" cy="59" r="17" fill="none" stroke="#c8882a" stroke-width="2"/><circle cx="45" cy="45" r="8" fill="none" stroke="#c8882a" stroke-width="2"/></svg>
+  </div>
+  <p class="footer-text">Hecho con mucho amor (y algo de cava) por <strong>Ayelm &amp; Dani</strong></p>
+  <p class="footer-text" style="margin-top:4px;font-size:11px;opacity:.5">Las Loquistas del Centro · Barcelona, 2025</p>
+</div>
+
+</div><!-- /content -->
+
+<script>
+// ── PANOT WATERMARK SVG ──
+function panotico(s){return`<svg class="card-watermark" viewBox="0 0 90 90" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="3" width="84" height="84" stroke="#c8882a" stroke-width="2.5"/><circle cx="31" cy="31" r="17" stroke="#c8882a" stroke-width="2.5"/><circle cx="59" cy="31" r="17" stroke="#c8882a" stroke-width="2.5"/><circle cx="31" cy="59" r="17" stroke="#c8882a" stroke-width="2.5"/><circle cx="59" cy="59" r="17" stroke="#c8882a" stroke-width="2.5"/><circle cx="45" cy="45" r="8" stroke="#c8882a" stroke-width="2"/></svg>`;}
+
+// ── DATA ──
+
+const favData = [
+  // ── COMIDA RESIDENTE (top picks de la lista) ──
+  {name:"Maleducat",tipo:"residente",cat:"comida",zona:"Eixample",rating:"4.8",price:"50-70€",tip:"<strong>El favorito favorito.</strong> Menú degustació a 49€ que parece mucho y es una ganga. Reserva con semanas de antelación.",featured:true},
+  {name:"Darvaza",tipo:"residente",cat:"comida",zona:"Eixample",rating:"4.6",price:"50-100€",tip:"Para una noche especial. Brasería increíble. Pide el carpaccio de dry aged y la picanha gallega."},
+  {name:"Sannin",tipo:"residente",cat:"comida",zona:"Gràcia",rating:"4.5",price:"10-20€",tip:"El mejor libanés de la ciudad, sin discusión. El baba ganoush es el más ahumado que has probado."},
+  {name:"Ceviche 103",tipo:"residente",cat:"comida",zona:"Eixample",rating:"4.7",price:"20-40€",tip:"Peruana de autor, de las mejores de BCN. <strong>La parihuela</strong> y las vieiras son lo mejor del menú."},
+  {name:"Restaurante Harry's",tipo:"residente",cat:"comida",zona:"Eixample",rating:"4.5",price:"20-40€",tip:"Italiana de barrio con mucha regularidad. Buena pasta, ambiente animado y cocina que no defrauda."},
+  {name:"La Cuina de Laietana",tipo:"residente",cat:"comida",zona:"Gòtic",rating:"4.5",price:"20-30€",tip:"Cocina mediterránea honesta en pleno casco antiguo. De los pocos buenos en una zona muy turística."},
+  {name:"Honest Greens",tipo:"residente",cat:"comida",zona:"Eixample",rating:"4.5",price:"10-20€",tip:"Comida sana de verdad, rica y sin pesadez. Ideal para cuando quieres comer bien sin excesos."},
+  {name:"Acero",tipo:"residente",cat:"comida",zona:"Barcelona",rating:"4.7",price:"10-20€",tip:"<strong>La mejor hamburguesa de la ciudad</strong> según mucha gente. Hechas con carne de calidad. Sin florituras."},
+  {name:"Timesburg",tipo:"residente",cat:"comida",zona:"Les Corts",rating:"4.4",price:"10-20€",tip:"Otra hamburguesa de nivel. Más formal que Acero, con buenas patatas. Del barrio de casa."},
+  {name:"Goiko",tipo:"residente",cat:"comida",zona:"Eixample",rating:"4.4",price:"10-20€",tip:"La cadena de hamburguesas española que lo hace bien. Para cuando necesitas algo contundente."},
+  {name:"Las Fritas",tipo:"residente",cat:"comida",zona:"Barcelona",rating:"4.4",price:"1-10€",tip:"Solo patatas fritas, pero hechas de 1000 maneras. <strong>Un vicio inconfesable</strong> que ahora es tuyo también."},
+  {name:"Isabella's Restaurant",tipo:"residente",cat:"comida",zona:"Eixample",rating:"4.5",price:"20-40€",tip:"Italiana con ambiente acogedor. Buena pasta fresca y atención muy cuidada. Para cenas en pareja."},
+  {name:"Restaurante Bella's",tipo:"residente",cat:"comida",zona:"Eixample",rating:"4.4",price:"20-30€",tip:"Italiana de confianza. El tipo de sitio al que vuelves porque sabes que no falla."},
+  {name:"Concepto Nonna",tipo:"residente",cat:"comida",zona:"Eixample",rating:"4.2",price:"20-30€",tip:"Italiana con concepto más moderno. Buenas masas, ingredientes de calidad, ambiente cuidado."},
+  {name:"Saona Aribau",tipo:"residente",cat:"comida",zona:"Eixample",rating:"4.4",price:"20-30€",tip:"Mediterránea muy sólida. Carta amplia, buena relación calidad-precio y terraza que mola."},
+  {name:"Lateral Consell de Cent",tipo:"residente",cat:"comida",zona:"Eixample",rating:"4.3",price:"20-30€",tip:"Tapas modernas en formato de bar. Bueno para cenas informales con amigos."},
+  {name:"A Vocados Ferran",tipo:"residente",cat:"comida",zona:"Gòtic",rating:"4.6",price:"10-20€",tip:"Los boles de aguacate más completos de la ciudad. Muy céntrico y siempre frescos."},
+  {name:"El Racó de les Brases",tipo:"residente",cat:"comida",zona:"Barcelona",rating:"4.1",price:"10-20€",tip:"Cocina mediterránea de brasa, con buen producto. De los sitios que los locales tienen apuntados."},
+  {name:"MINIM'S",tipo:"residente",cat:"comida",zona:"Barcelona",rating:"4.4",price:"10-20€",tip:"Restaurante pequeño y con personalidad. Cocina de mercado sin pretensiones. Muy de barrio."},
+  {name:"El Pibe",tipo:"residente",cat:"comida",zona:"Les Corts",rating:"4.3",price:"10-20€",tip:"Cocina argentina informal. Empanadas y carnes a buen precio. Del barrio de casa."},
+  // ── BAR ──
+  {name:"Bodega Vasconia",tipo:"residente",cat:"bar",zona:"Gòtic",rating:"4.6",price:"20-30€",tip:"Bodega con encanto en el Gòtic. Vinos baratos, ensaladilla brutal. Auténtico."},
+  {name:"Gats",tipo:"residente",cat:"bar",zona:"Raval",rating:"4.6",price:"20-30€",tip:"Bar de tapas con mucho ambiente. La sopa de cebolla y la paella son los platos estrella."},
+  {name:"Bar Betlem",tipo:"residente",cat:"bar",zona:"Eixample",rating:"4.5",price:"20-30€",tip:"Cocina de mercado con toque creativo. La terraza un domingo con vermut es el plan perfecto."},
+  {name:"Vinitus",tipo:"residente",cat:"bar",zona:"Eixample",rating:"4.5",price:"20-30€",tip:"Tapas de calidad. La alcachofa frita es lo mejor que tienen. Siempre lleno."},
+  {name:"Ciudad Condal",tipo:"residente",cat:"bar",zona:"Eixample",rating:"4.4",price:"20-30€",tip:"Clásico para el vermut del sábado. El bacallà amb mel y las bravas. <strong>Patrimonio de BCN.</strong>"},
+  {name:"Rooftop Garden",tipo:"residente",cat:"bar",zona:"Barcelona",rating:"4.3",price:"20-80€",tip:"Terraza en altura con vistas. Para cócteles con el skyline de fondo. Ambiente cuidado."},
+  {name:"Salts Bar Montjuïc",tipo:"residente",cat:"bar",zona:"Montjuïc",rating:"4.3",price:"10-20€",tip:"Bar tranquilo en Montjuïc. Perfecto para una copa después de pasear por la montaña."},
+  {name:"El Bosque de las Hadas",tipo:"residente",cat:"bar",zona:"Barcelona",rating:"4.4",price:"10-20€",tip:"Bar con decoración única y muy especial. Para copas en un ambiente completamente diferente."},
+  {name:"A Viva Voz",tipo:"residente",cat:"bar",zona:"Barcelona",rating:"4.2",price:"10-20€",tip:"<strong>Karaoke.</strong> El mejor karaoke de la ciudad. Noches que no se olvidan. Imprescindible con amigos."},
+  // ── BRUNCH & CAFÉ ──
+  {name:"Garage Coffee",tipo:"residente",cat:"brunch",zona:"Les Corts",rating:"4.9",price:"10-20€",tip:"<strong>El mejor brunch de Barcelona.</strong> Los pancakes y el café helado son de otro nivel.",featured:true},
+  {name:"Bistrot Lady Babka",tipo:"residente",cat:"brunch",zona:"El Born",rating:"4.8",price:"10-20€",tip:"El brunch más bonito del Born. Los huevos turcos con yogur y chile son adictivos."},
+  {name:"Pepe y Lepu Café",tipo:"residente",cat:"brunch",zona:"Eixample",rating:"4.7",price:"10-20€",tip:"Cafetería con mucha personalidad. Perfecta para desayunos tranquilos entre semana."},
+  {name:"Café Pendiente",tipo:"residente",cat:"brunch",zona:"Barcelona",rating:"4.8",price:"10-20€",tip:"<strong>4.8 con miles de reseñas.</strong> Brunch de los buenos, con productos de calidad y espacio bonito."},
+  {name:"Federal Cafè",tipo:"residente",cat:"brunch",zona:"Sant Antoni",rating:"4.0",price:"10-20€",tip:"Pionero del brunch en Barcelona. Siempre con cola pero siempre vale la pena. El de Sant Antoni."},
+  {name:"Federal Café Gótico",tipo:"residente",cat:"brunch",zona:"Gòtic",rating:"4.2",price:"10-20€",tip:"La versión del Gòtic del Federal. Misma filosofía, mejor ubicación si estás en el centro."},
+  {name:"Alice Secret Garden",tipo:"residente",cat:"brunch",zona:"Barcelona",rating:"3.9",price:"10-20€",tip:"Brunch con jardín secreto en el interior. El espacio es lo que lo hace especial."},
+  {name:"El Árbol",tipo:"residente",cat:"brunch",zona:"Barcelona",rating:"4.2",price:"10-20€",tip:"Brunch tranquilo con mucho verde. Ambiente relajado, buena tortilla y zumos frescos."},
+  {name:"Granja Petitbo",tipo:"residente",cat:"brunch",zona:"Gràcia",rating:"4.1",price:"10-20€",tip:"Brunch clásico en Gràcia. De los primeros en el barrio. Buena granola y huevos Benedict."},
+  {name:"Alsur Café",tipo:"residente",cat:"brunch",zona:"Born",rating:"4.3",price:"10-20€",tip:"Brunch con opción de cócteles. El Backdoor Bar es el espacio de noche, más íntimo."},
+  {name:"BÖL",tipo:"residente",cat:"brunch",zona:"Eixample",rating:"4.3",price:"10-20€",tip:"Boles de ingredientes de calidad. Muy bueno para desayuno tardío después de correr."},
+  {name:"Juice Dudes",tipo:"residente",cat:"brunch",zona:"Barcelona",rating:"4.4",price:"1-10€",tip:"Açaí bowls y zumos de verdad. Sin azúcares añadidos. El mejor para recuperar después del running."},
+  {name:"Faborit Casa Amatller",tipo:"residente",cat:"brunch",zona:"Passeig de Gràcia",rating:"4.3",price:"1-10€",tip:"Café con vistas al Passeig de Gràcia. La mejor terraza del Eixample para un café."},
+  {name:"Brooklyn Cafe",tipo:"residente",cat:"brunch",zona:"Eixample",rating:"4.3",price:"1-10€",tip:"Cafetería de estilo neoyorquino. Buena selección de tés y cafés de especialidad."},
+  {name:"Granja Dulcinea",tipo:"residente",cat:"brunch",zona:"Gòtic",rating:"4.2",price:"",tip:"<strong>Clásico histórico del Gòtic.</strong> Chocolate a la taza y suizos. La experiencia barcelonesa de desayuno."},
+  {name:"Boldú Rosselló",tipo:"residente",cat:"brunch",zona:"Eixample",rating:"4.2",price:"1-10€",tip:"Panadería artesana de barrio. Los croissants y el pan con tomate de la mañana son lo mejor."},
+  // ── PIZZA ──
+  {name:"Sartoria Panatieri",tipo:"residente",cat:"pizza",zona:"Gràcia",rating:"4.4",price:"20-30€",tip:"<strong>Top 10 mundial.</strong> Sin exagerar. La pizza de coliflor asada es mejor que cualquier margarita. Reserva obligatoria.",featured:true},
+  {name:"La Balmesina",tipo:"residente",cat:"pizza",zona:"Eixample",rating:"4.6",price:"10-20€",tip:"La pizzería de barrio perfecta. Masa napolitana auténtica, sin cola si vas entre semana."},
+  {name:"Madre Lievito",tipo:"residente",cat:"pizza",zona:"Sant Martí",rating:"4.3",price:"10-20€",tip:"Pizza romana en pala, estilo diferente a la napolitana. Muy crujiente y ligera."},
+  {name:"Pizzeria MAMA",tipo:"residente",cat:"pizza",zona:"Barcelona",rating:"4.5",price:"10-20€",tip:"Pizzería pequeña con mucho encanto. Las pizzas son buenas y el ambiente familiar."},
+  {name:"Grosso Napoletano",tipo:"residente",cat:"pizza",zona:"Eixample",rating:"4.2",price:"10-20€",tip:"Cadena italiana que lo hace bien. Masa de verdad, ingredientes importados de Italia."},
+  {name:"GUSTO PREFERITO",tipo:"residente",cat:"pizza",zona:"Barcelona",rating:"4.4",price:"10-20€",tip:"Pizzería italiana pequeña y auténtica. De las mejores masas del barrio."},
+  {name:"Little Italy 2.0",tipo:"residente",cat:"pizza",zona:"Barcelona",rating:"4.7",price:"10-20€",tip:"Pizzería con 4.7 de nota — nada más que añadir. <strong>Busca la y ve.</strong>"},
+  // ── HELADO ──
+  {name:"Flor Gelato",tipo:"residente",cat:"helado",zona:"Barcelona",rating:"4.9",price:"",tip:"<strong>4.9 estrellas.</strong> El mejor gelato de Barcelona, sin discusión. Ingredientes de verdad, sabores únicos.",featured:true},
+  {name:"Cremeria Toscana",tipo:"residente",cat:"helado",zona:"Eixample",rating:"4.6",price:"",tip:"Heladería italiana clásica. La pistacho y la stracciatella son las reinas."},
+  // ── TURISTA ──
+  {name:"Sagrada Família",tipo:"turista",cat:"cultura",zona:"Eixample",rating:"4.8",price:"Desde 26€",tip:"<strong>Sí, lo sabemos.</strong> Pero por dentro es completamente distinto a todo lo que imaginas. Compra con torre.",featured:true},
+  {name:"Palau de la Música",tipo:"turista",cat:"cultura",zona:"Gòtic",rating:"4.7",price:"Desde 22€",tip:"Modernismo puro. <strong>Aún mejor: ve a un concierto de noche.</strong> La cúpula de colores es mágica."},
+  {name:"Fundació Joan Miró",tipo:"turista",cat:"cultura",zona:"Montjuïc",rating:"4.5",price:"15€",tip:"Muy infravalorada. El edificio de Sert es tan bueno como las obras. Combina con el castillo."},
+  {name:"Park Güell",tipo:"turista",cat:"cultura",zona:"Gràcia",rating:"4.4",price:"10€",tip:"<strong>Entra a las 9:30h</strong> para evitar masas. Compra online. La parte gratuita también vale."},
+  {name:"Bunkers del Carmel",tipo:"turista",cat:"mirador",zona:"El Carmel",rating:"4.6",price:"Gratis",tip:"<strong>Las mejores vistas 360° de BCN.</strong> Mar, montaña y ciudad a la vez. Ve al atardecer.",featured:true},
+  {name:"Telefèric del Port",tipo:"turista",cat:"mirador",zona:"Port Vell",rating:"4.2",price:"13€ i/v",tip:"Vistas al mar y la ciudad únicas. Mejor al caer el sol. Combina con paseo por el Born."},
+  {name:"El Xampanyet",tipo:"turista",cat:"bar",zona:"El Born",rating:"4.6",price:"20-30€",tip:"<strong>Bar histórico del 1929.</strong> Anchovas, cava de la casa y tortilla de bacallà. Espera garantizada."},
+  {name:"Bar Marsella",tipo:"turista",cat:"bar",zona:"El Raval",rating:"4.4",price:"10-20€",tip:"El bar más antiguo de BCN (1820). <strong>El ritual de la absenta.</strong> Solo abre por las tardes."},
+];
+
+const runData = [
+  {name:"Passeig Marítim",dist:"7 km",desnivel:"Plano",cuando:"Cualquier día",tip:"El clásico. De la Barceloneta hasta el Fòrum. Al amanecer es mágico, sin turistas."},
+  {name:"Montjuïc completo",dist:"10-14 km",desnivel:"400m+",cuando:"Fines de semana",tip:"Subida por la Satalia, rodea el castillo, baja por la Font del Gat. <strong>Vistas en cada curva.</strong>"},
+  {name:"Parc de la Ciutadella",dist:"4-6 km",desnivel:"Plano",cuando:"Entre semana",tip:"Loop tranquilo en el parque más bonito. Para días de piernas cansadas sin estresarte con tráfico."},
+  {name:"Collserola: cresta",dist:"15-25 km",desnivel:"600m+",cuando:"Sábados",tip:"La joya escondida. Corre la cresta con vistas a toda la ciudad y el Mediterráneo. <strong>Espectacular.</strong>"},
+  {name:"Ronda del Litoral",dist:"12 km",desnivel:"Plano",cuando:"Mañana temprano",tip:"De la Barceloneta hasta Diagonal Mar. Mucho menos transitado que el Passeig Marítim."},
+  {name:"Tibidabo + Carretera de les Aigues",dist:"18 km",desnivel:"500m+",cuando:"Sábados",tip:"Sube al Tibidabo y corre la Carretera de les Aigues de extremo a extremo. <strong>El favorito de los locales.</strong>"},
+  {name:"Gràcia — Park Güell loop",dist:"8 km",desnivel:"200m+",cuando:"Tarde entre semana",tip:"Sube por Gràcia, rodea el Park Güell, baja por el Carmel. Urbano y con desnivel."},
+  {name:"Barceloneta + Poblenou",dist:"9 km",desnivel:"Plano",cuando:"Cualquier día",tip:"Rodaje largo de playa. Buena superficie, pocas interrupciones. Termina con café en la Rambla del Poblenou."},
+];
+
+const escData = [
+  {name:"Sitges",cat:"costa",dist:"40 min tren",tip:"La ciudad gay más icónica de Catalunya. <strong>Carnival en febrero</strong> es único. Playas bonitas y casco histórico precioso.",featured:true},
+  {name:"Tossa de Mar",cat:"costa",dist:"1h 20min bus",tip:"Casco medieval amurallado junto al mar. Las calas alrededor son espectaculares. Costa Brava en estado puro."},
+  {name:"Cadaqués",cat:"costa",dist:"3h coche",tip:"<strong>El pueblo más bonito de Catalunya.</strong> Casitas blancas, la casa de Dalí al lado. En temporada baja es mágico.",featured:true},
+  {name:"Begur y las calas",cat:"costa",dist:"2h coche",tip:"Begur medieval a 10 minutos de las calas de Sa Riera y Aiguafreda. Aguas turquesas de postal."},
+  {name:"Calella de Palafrugell",cat:"costa",dist:"2h coche/bus",tip:"La Costa Brava en estado puro. Havaneres en verano y el mejor arroz de pescado de tu vida. <strong>Imprescindible.</strong>"},
+  {name:"Cap de Creus",cat:"costa",dist:"3h coche",tip:"El punto más oriental de la Península. Paisaje de roca y viento, con el mar más salvaje."},
+  {name:"L'Estartit y les Medes",cat:"costa",dist:"2h coche",tip:"Snorkel y buceo en las Illes Medes, reserva marina. El agua más transparente de Catalunya."},
+  {name:"Cal Pinxo Sitges",cat:"costa",dist:"40 min tren",tip:"El mejor restaurante de Sitges. <strong>Arroces y marisco de primer nivel.</strong> Para celebrar algo especial."},
+  {name:"Montserrat",cat:"montana",dist:"1h tren+cremallera",tip:"La montaña sagrada de Catalunya. Formas imposibles, el monasterio benedictino. Sale de Plaça Espanya."},
+  {name:"La Garrotxa (volcanes)",cat:"montana",dist:"2h coche",tip:"Zona volcánica única en Europa. Santa Pau medieval, el volcán Croscat y la Fageda d'en Jordà. Alucinante."},
+  {name:"Vic",cat:"pueblo",dist:"1h tren",tip:"Capital de la charcutería catalana. El mercado del sábado en la plaça Major es de los mejores."},
+  {name:"Besalú",cat:"pueblo",dist:"2h coche",tip:"Pueblo medieval perfectamente conservado con el puente románico más fotografiado de Catalunya."},
+];
+
+const fieData = [
+  {name:"Arena Madre",cat:"gay",zona:"Gayxample",tip:"El club gay más grande y conocido del Gayxample. Música comercial y ambiente muy festivo. <strong>El punto de partida de cualquier noche gay.</strong>",featured:true},
+  {name:"D!Club",cat:"gay",zona:"Gayxample",tip:"Uno de los mejores clubs gays de BCN. Electrónica de calidad, ambiente muy abierto. Perfecto cualquier fin de semana."},
+  {name:"El Cangrejo",cat:"gay",zona:"Raval",tip:"Bar vintage con mucho encanto, muy frecuentado. Copas baratas, ambiente de barrio, sin pretensiones. <strong>Un clásico.</strong>"},
+  {name:"The Moon",cat:"gay",zona:"Eixample",tip:"Bar de copas muy frecuentado por la comunidad LGTBI+. Perfecto para empezar la noche antes del club."},
+  {name:"Razzmatazz",cat:"club",zona:"Poblenou",tip:"<strong>5 salas, 5 géneros, una noche.</strong> El club más grande de la ciudad. Electrónica, indie, techno, pop... imprescindible.",featured:true},
+  {name:"Sala Apolo / Nitsa",cat:"club",zona:"Poble Sec",tip:"Sala histórica. Nitsa Club los sábados es legendario en toda Europa. La[2] para techno más íntimo."},
+  {name:"RAZZ",cat:"club",zona:"Eixample",tip:"Sala de conciertos y club de referencia. <strong>El escenario más icónico de la ciudad</strong> para música en vivo."},
+  {name:"Pacha Barcelona",cat:"club",zona:"Port Olímpic",tip:"El templo del house de lujo en Barcelona. DJs internacionales cada fin de semana."},
+  {name:"Moog Club",cat:"club",zona:"Raval",tip:"Club pequeño e intenso de techno minimal. Reconocido en toda Europa. Solo en BCN encuentras esto a 5€."},
+  {name:"Bar Marsella",cat:"bares",zona:"Raval",tip:"El bar más antiguo de BCN (1820). Para empezar la noche con historia. El ritual de la absenta."},
+  {name:"El Xampanyet",cat:"bares",zona:"El Born",tip:"Bar del 1929 en la calle Montcada. Anchovas, cava de la casa. Para la ruta de bares del Born."},
+  {name:"Ocio Bar",cat:"bares",zona:"Barcelona",rating:"4.1",tip:"Bar de ambiente nocturno con buen rollo. Para copas de madrugada cuando los demás ya han cerrado."},
+];
+
+const asiaData = [
+  {name:"Mormor Supermercado Asiático",cat:"tienda",zona:"Gràcia",rating:"4.8",tip:"<strong>El konbini más auténtico de BCN.</strong> De tu lista. Onigiri, matcha, snacks japoneses y coreanos que no encontrarás en otro sitio.",featured:true},
+  {name:"KOYO Sushi Pau Claris",cat:"japones",zona:"Eixample",rating:"4.0",tip:"De tu lista. Sushi de calidad a precio razonable. El omakase de mediodía es la mejor relación calidad-precio."},
+  {name:"Sushi Hanaki",cat:"japones",zona:"Eixample",rating:"4.2",tip:"De tu lista. Más tradicional que Koyo, buen sake y ambiente íntimo. Para cenas tranquilas."},
+  {name:"DAFUDON",cat:"japones",zona:"Eixample",rating:"3.9",tip:"Ramen auténtico sin pretensiones. El caldo de miso es sólido. Para cuando necesitas reconfortarte."},
+  {name:"Amazonia Açaí",cat:"asiatico",zona:"Barcelona",rating:"4.4",tip:"De tu lista. Bowls de açaí sin azúcares añadidos. <strong>Para después de correr es ideal.</strong>"},
+  {name:"Osaka (Passeig de Gràcia)",cat:"japones",zona:"Eixample",tip:"El japonés de lujo de BCN. Cocina nikkei (japonesa-peruana). Para una noche especial."},
+  {name:"Supermercados del Raval",cat:"tienda",zona:"Raval",tip:"Los grandes supermercados asiáticos de la calle Joaquín Costa. Ingredientes frescos, snacks imposibles, precios ridículos."},
+  {name:"Izakaya Arigato",cat:"japones",zona:"Born",tip:"Bar japonés de tapas. Gyozas, karaage, yakitori. Informal y muy animado. Para compartir muchos platillos."},
+  {name:"Mercat Abaceria (asiático)",cat:"tienda",zona:"Gràcia",tip:"Puestos con especias y productos asiáticos frescos. Parada imprescindible si cocinas en casa."},
+];
+
+const planesData = [
+  {name:"Vermut en el Poblenou",tip:"El barrio que está cambiando la ciudad. Bares de vermut, industria reconvertida, ambiente local sin guiris. <strong>La Rambla del Poblenou</strong> un sábado al mediodía."},
+  {name:"Castillo de Montjuïc al atardecer",tip:"Subir en el telefèric, dar una vuelta al castillo y quedarte viendo caer el sol sobre el Mediterráneo. Gratis los domingos después de las 18h."},
+  {name:"Mercat de Sant Antoni",tip:"<strong>El mercado más bonito de BCN</strong> tras la reforma. Domingo hay mercado de libros de segunda mano fuera. Desayuno con coca de recapte dentro."},
+  {name:"Concierto en el Palau de la Música",tip:"Jazz, flamenco, clásica, world music. Ese interior iluminado con música en vivo es una de las experiencias más únicas de la ciudad."},
+  {name:"Piscina Olímpica de Montjuïc",tip:"<strong>La piscina olímpica con vistas al mar.</strong> Ves todo el skyline mientras nadas. Barata y abierta al público. Una de las cosas más singulares."},
+  {name:"Ruta de modernisme gratis",tip:"El Eixample tiene más de 150 edificios modernistas. Con la app puedes hacer el tour tú solo. La mayoría de fachadas se ven gratis desde la calle."},
+  {name:"Mercado del Encants",tip:"El rastro más espectacular de Europa, bajo una cubierta de espejos que refleja la ciudad. <strong>Puedes encontrar cualquier cosa.</strong> Domingos y lunes."},
+  {name:"Paseo en bici por el litoral",tip:"Alquila una Bicing y recorre los 20km del litoral hasta El Prat. Sin coches, con el mar a un lado. Gran ventaja de vivir aquí."},
+  {name:"Noche de pintxos en el Born",tip:"El bar vasco Euskal Etxea del Born. Pintxos fríos y calientes desde las 19h. <strong>Llega antes de las 20h</strong> o no quedan los buenos."},
+  {name:"Ceramicaria Gràcia",tip:"Taller de cerámica en Gràcia. Cursos de iniciación muy asequibles. Para aprender algo nuevo con las manos y conocer gente del barrio."},
+  {name:"A Viva Voz Karaoke",tip:"<strong>El mejor karaoke de BCN.</strong> De tu lista. Noches que no se olvidan. Imprescindible organizar una noche de grupo aquí."},
+];
+
+const romanticData = [
+  {name:"Cena en Maleducat",tip:"El menú degustació para dos, con maridaje. Una mesa junto a la ventana. Pide que el sommelier recomiende el vino. <strong>La cena perfecta de bienvenida a BCN.</strong>",featured:true},
+  {name:"Paseo nocturno por el Born",tip:"Después de cenar, caminad por la calle Montcada, entrad al Xampanyet si está abierto, y acabad en el Parc de la Ciutadella de noche. Gratis y precioso."},
+  {name:"Amanecer en los Búnkeres",tip:"Despertador a las 5:30h, subir a los Búnkeres con un termo de café y ver salir el sol sobre BCN y el Mediterráneo. <strong>Solos o casi solos.</strong>",featured:true},
+  {name:"Día en Cadaqués",tip:"Bus o coche, un día completo en el pueblo más bonito de Catalunya. Calles blancas, el Cap de Creus, vermut en la plaza. <strong>Llevad la cámara.</strong>"},
+  {name:"Palau de la Música + cena en el Born",tip:"Concierto de jazz en el Palau y cena en alguno de los restaurantes del Born. El programa perfecto para una noche especial."},
+  {name:"Spa Aire Ancient Baths",tip:"Los baños árabes más bonitos de BCN, en el Gòtic. Piscinas termales, circuito de aguas y masajes. <strong>Una tarde de relax total.</strong> Reserva con antelación."},
+  {name:"Picnic en Collserola",tip:"Comprar en cualquier charcutería del Eixample, coger el FGC hasta Tibidabo y hacer un picnic en el bosque con vistas a la ciudad."},
+  {name:"Cócteles en el Cotton House Hotel",tip:"De tu lista. Uno de los bares más elegantes de BCN en Passeig de Gràcia. Para un cóctel bien hecho en un ambiente de otro tiempo."},
+  {name:"Tour en velero por el litoral",tip:"Velero con patrón para 2 personas desde el Port Olímpic. Ver la ciudad desde el mar, nadar en alta mar. 2-3 horas y no tan caro para dos."},
+  {name:"Rooftop Garden al atardecer",tip:"De tu lista. Cócteles con las luces de la ciudad a vuestros pies. Para celebrar la llegada de Kevin a Barcelona. <strong>La primera noche épica.</strong>"},
+];
+
+// ── RENDER ──
+
+function badge(cls,label){return`<span class="badge badge-${cls}">${label}</span>`;}
+
+function makeCard(p,type){
+  const el=document.createElement('div');
+  let cls='card';
+  if(type==='romantic') cls+=' romantic-card';
+  if(type==='run') cls+=' run-card';
+  if(p.featured) cls+=' featured';
+  el.className=cls;
+
+  if(type==='run'){
+    el.innerHTML=`
+      <div class="card-badges" style="margin-bottom:8px">${badge('running','running')}</div>
+      <div class="card-name">${p.name}</div>
+      <div class="run-stat">
+        <div class="run-stat-item"><span class="run-stat-val">${p.dist}</span><span class="run-stat-label">distancia</span></div>
+        <div class="run-stat-item"><span class="run-stat-val">${p.desnivel}</span><span class="run-stat-label">desnivel</span></div>
+        <div class="run-stat-item"><span class="run-stat-val" style="font-size:10px">${p.cuando}</span><span class="run-stat-label">cuándo</span></div>
+      </div>
+      <div class="card-tip">${p.tip}</div>
+      ${panotico()}`;
+  } else if(type==='romantic'){
+    el.innerHTML=`
+      <div class="card-badges" style="margin-bottom:8px">${badge('romantico','♡ plan para dos')}</div>
+      <div class="card-name">${p.name}</div>
+      <div class="card-tip" style="margin-top:8px">${p.tip}</div>
+      ${panotico()}`;
+  } else if(type==='plan'){
+    el.innerHTML=`
+      <div class="card-badges" style="margin-bottom:8px">${badge('plan','plan')}</div>
+      <div class="card-name">${p.name}</div>
+      <div class="card-tip" style="margin-top:8px">${p.tip}</div>
+      ${panotico()}`;
+  } else {
+    const tipoBadge=p.tipo?badge(p.tipo,p.tipo==='residente'?'⌂ residente':'✈ turista'):'';
+    const catBadge=p.cat?badge(p.cat,p.cat):'';
+    const ratingEl=p.rating?`<div class="card-rating">★ ${p.rating}</div>`:'';
+    const meta=[p.zona,p.price,p.dist].filter(Boolean).join(' · ');
+    el.innerHTML=`
+      <div class="card-header"><div class="card-badges">${tipoBadge}${catBadge}</div>${ratingEl}</div>
+      <div class="card-name">${p.name}</div>
+      ${meta?`<div class="card-meta">${meta}</div>`:''}
+      <div class="card-tip">${p.tip}</div>
+      ${panotico()}`;
+  }
+  return el;
+}
+
+function renderGrid(data,gridId,type,filterFn){
+  const grid=document.getElementById(gridId);
+  if(!grid)return 0;
+  grid.innerHTML='';
+  const items=filterFn?data.filter(filterFn):data;
+  if(!items.length){grid.innerHTML='<div class="empty-state">Nada por aquí... ¡de momento!</div>';return 0;}
+  items.forEach((p,i)=>{const c=makeCard(p,type);c.style.animationDelay=(i*.04)+'s';grid.appendChild(c);});
+  return items.length;
+}
+
+// ── FILTER LOGIC ──
+function filterTab(section,f,btn){
+  // update active button
+  const panel=document.getElementById('tab-'+{fav:'favoritos',esc:'escapadas',fie:'fiesta',asia:'asia'}[section]||section);
+  const container=document.getElementById(section+'-filters');
+  if(container) container.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+
+  const titleMap={
+    fav:{all:'Todos los favoritos',residente:'Modo residente',turista:'Modo turista',comida:'Para comer',bar:'Para beber',brunch:'Brunch & Café',pizza:'Las mejores pizzas',helado:'Helados',cultura:'Cultura',mirador:'Las mejores vistas'},
+    esc:{all:'Escapadas imprescindibles',costa:'Costa y playas',pueblo:'Pueblos',montana:'Montaña y naturaleza'},
+    fie:{all:'Noche & Fiesta',gay:'Ambiente gay',club:'Clubs',bares:'Bares nocturnos'},
+    asia:{all:'Asia & Bazares',japones:'Japonés',tienda:'Bazares & Tiendas',asiatico:'Otros asiáticos'},
+  };
+
+  const titleEl=document.getElementById(section+'-title');
+  const countEl=document.getElementById(section+'-count');
+  if(titleEl&&titleMap[section]) titleEl.textContent=titleMap[section][f]||'Favoritos';
+
+  let n=0;
+  if(section==='fav'){
+    n=renderGrid(favData,'fav-grid','card',f==='all'?null:p=>p.tipo===f||p.cat===f);
+  } else if(section==='esc'){
+    n=renderGrid(escData,'esc-grid','card',f==='all'?null:p=>p.cat===f);
+  } else if(section==='fie'){
+    n=renderGrid(fieData,'fie-grid','card',f==='all'?null:p=>p.cat===f);
+  } else if(section==='asia'){
+    n=renderGrid(asiaData,'asia-grid','card',f==='all'?null:p=>p.cat===f);
+  }
+  if(countEl) countEl.textContent=n+' sitio'+(n!==1?'s':'');
+}
+
+function switchTab(tab,btn){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.add('active');
+  if(btn) btn.classList.add('active');
+}
+
+// ── INIT ──
+filterTab('fav','all',document.querySelector('#tab-favoritos .filter-btn'));
+renderGrid(runData,'run-grid','run');
+filterTab('esc','all',document.querySelector('#tab-escapadas .filter-btn'));
+filterTab('fie','all',document.querySelector('#tab-fiesta .filter-btn'));
+filterTab('asia','all',document.querySelector('#tab-asia .filter-btn'));
+const pn=renderGrid(planesData,'planes-grid','plan');
+document.getElementById('planes-count').textContent=pn+' planes';
+const rn=renderGrid(romanticData,'romantic-grid','romantic');
+document.getElementById('romantic-count').textContent=rn+' planes';
+</script>
+</body>
+</html>
